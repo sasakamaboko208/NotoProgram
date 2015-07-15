@@ -13,15 +13,15 @@ public class CharaAnimation : MonoBehaviour {
 		return attacked;
 	}
 
-	void StartAttackedHit(){
+	void StartAttackHit(){
 		Debug.Log("Start");
 	}
 
-	void EndAttackedHit(){
+	void EndAttackHit(){
 		Debug.Log("End");
 	}
 
-	void EndAttacked(){
+	void EndAttack(){
 		attacked = true;
 	}
 

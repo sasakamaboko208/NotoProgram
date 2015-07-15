@@ -20,13 +20,53 @@ public class CharacterStatus : MonoBehaviour {
 	public bool attacking = false;
 	public bool died = false;
 
+	//攻撃力強化
+	bool m_powerBoost = false;
+
+	//攻撃強化時間
+	float m_powerBoostTime = 0.0f;
+
+	//パワーアップエフェクト
+	ParticleSystem m_powerUpEffect;
+
 	// Use this for initialization
 	void Start () {
-	
+		if(gameObject.tag == "Player"){
+			m_powerUpEffect = transform.Find("PowerUpEffect").GetComponent<ParticleSystem>();
+		}
+	}
+
+	//更新処理
+	void Update () {
+		if(gameObject.tag != "Player"){
+			return;
+		}
+
+		m_powerBoost = false;
+		if(m_powerBoostTime > 0.0f){
+			m_powerBoost = true;
+			m_powerBoostTime = Mathf.Max (m_powerBoostTime -Time.deltaTime, 0.0f);
+		}else{
+			m_powerUpEffect.Stop();
+		}
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
+	//アイテム取得
+	public void GetItem(DropItem.ItemKind itemKind){
+		switch(itemKind){
+		case DropItem.ItemKind.AttackUp:
+			m_powerBoostTime = 5.0f;
+			m_powerUpEffect.Play();
+			break;
+		case DropItem.ItemKind.Heal:
+			//MaxHPの半分回復
+			HP = Mathf.Min(HP + MaxHP / 2, MaxHP);
+			break;
+		}
+	}
+
+	//ブーストフラグ
+	public bool getBoostFlg(){
+		return m_powerBoost;
 	}
 }

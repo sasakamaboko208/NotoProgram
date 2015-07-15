@@ -6,9 +6,11 @@ public class PlayerCtrl : MonoBehaviour
 	const float RayCastMaxDistance = 100.0f;
 	CharacterStatus m_status;
 	CharaAnimation m_charaAnimation;
-	Transform attackTarget;
+	Transform m_attackTarget;
 	InputManager inputManager;
 	public float attackRange = 1.5f;
+
+	GameRuleCtrl m_gameRuleCtrl;
 
 	//状態の種類
 	enum State{
@@ -17,9 +19,19 @@ public class PlayerCtrl : MonoBehaviour
 		Died,
 	};
 
+
 	State m_state = State.Walking;		//現在のステート
 	State m_nextState = State.Walking;	//次のステート
 
+	//ヒットエフェクト変数
+	GameObject m_hitEffect;
+
+	//ターゲット位置変数
+	TargetCursor m_targetCursor;
+
+	void Awake(){
+		m_hitEffect = (GameObject)Resources.Load("Prefabs/HitEffect");
+	}
 
 	// Use this for initialization
 	void Start ()
@@ -27,6 +39,13 @@ public class PlayerCtrl : MonoBehaviour
 		m_status = GetComponent<CharacterStatus>();
 		m_charaAnimation = GetComponent<CharaAnimation>();
 		inputManager  = FindObjectOfType<InputManager>();
+
+		m_gameRuleCtrl = FindObjectOfType<GameRuleCtrl>();
+
+		m_targetCursor = FindObjectOfType<TargetCursor>();
+		m_targetCursor.SetPosition(transform.position);
+		AudioManager.getInstance.LoadSe("playerAttack","se_player_attack");
+		AudioManager.getInstance.LoadSe("playerDeath","se_player_death");
 	}
 	
 	// Update is called once per frames
@@ -73,11 +92,12 @@ public class PlayerCtrl : MonoBehaviour
 		m_status.attacking = true;
 
 		//敵の方に振り向かせる
-		Vector3 targetDirection = (attackTarget.position - transform.position).normalized;
+		Vector3 targetDirection = (m_attackTarget.position - transform.position).normalized;
 		SendMessage("SetDirection",targetDirection);
 
 		//移動を止める
 		SendMessage("StopMove");
+		AudioManager.getInstance.PlaySe("playerAttack");
 	}
 
 	void Attacking(){
@@ -88,6 +108,9 @@ public class PlayerCtrl : MonoBehaviour
 
 	void Died(){
 		m_status.died = true;
+		m_gameRuleCtrl.GameOver();
+
+		AudioManager.getInstance.PlaySe("playerDeath");
 	}
 
 	void WalkStart(){
@@ -107,6 +130,7 @@ public class PlayerCtrl : MonoBehaviour
 				//地面がクリックされたか
 				if(hitInfo.collider.gameObject.layer == LayerMask.NameToLayer("Ground")){
 					SendMessage("SetDestination",hitInfo.point);
+					m_targetCursor.SetPosition(hitInfo.point);
 				}
 
 				//敵がクリックされた
@@ -118,10 +142,12 @@ public class PlayerCtrl : MonoBehaviour
 
 					if(distance < attackRange){
 						//攻撃
-						attackTarget = hitInfo.collider.transform;
+						m_attackTarget = hitInfo.collider.transform;
+						m_targetCursor.SetPosition(m_attackTarget.position);
 						ChangeState(State.Attacking);
 					}else{
 						SendMessage("SetDestination",hitInfo.point);
+						m_targetCursor.SetPosition(hitInfo.point);
 					}
 				}
 			}
@@ -129,6 +155,10 @@ public class PlayerCtrl : MonoBehaviour
 	}
 
 	void Damage(AttackArea.AttackInfo attackInfo){
+		GameObject effect = Instantiate(m_hitEffect, transform.position, Quaternion.identity) as GameObject;
+		effect.transform.localPosition = transform.position + new Vector3(0.0f, 0.5f, 0.3f);
+		Destroy(effect, 0.3f);
+
 		m_status.HP -= attackInfo.attackPower;
 		if(m_status.HP <= 0){
 			m_status.HP = 0;

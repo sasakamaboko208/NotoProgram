@@ -2,11 +2,13 @@
 using System.Collections;
 
 public class AttackArea : MonoBehaviour {
-	CharacterStatus status;
+	CharacterStatus m_status;
 
 	// Use this for initialization
 	void Start () {
-		status = transform.root.GetComponent<CharacterStatus>();
+		m_status = transform.root.GetComponent<CharacterStatus>();
+		AudioManager.getInstance.LoadSe("enemyAttackHit","se_enemy_attack_hit");
+		AudioManager.getInstance.LoadSe("playerAttackHit","se_player_attack_hit");
 	}
 
 	public class AttackInfo{
@@ -18,7 +20,13 @@ public class AttackArea : MonoBehaviour {
 	AttackInfo GetAttackInfo(){
 		AttackInfo attackInfo = new AttackInfo();
 		//攻撃力の計算
-		attackInfo.attackPower = status.Power;
+		attackInfo.attackPower = m_status.Power;
+
+		//攻撃力の強化
+		if(m_status.getBoostFlg()){
+			attackInfo.attackPower += attackInfo.attackPower;
+		}
+
 		attackInfo.attacker = transform.root;
 
 		return attackInfo;
@@ -26,11 +34,16 @@ public class AttackArea : MonoBehaviour {
 
 	//当たった
 	void OnTriggerEnter(Collider other){
+		if(other.tag == "Player"){
+			AudioManager.getInstance.PlaySe("enemyAttackHit");
+		}else{
+			AudioManager.getInstance.PlaySe("playerAttackHit");
+		}
 		//攻撃が当たった相手にDamageメッセージを送る
 		other.SendMessage("Damage", GetAttackInfo());
 
 		//攻撃対象を保存
-		status.lastAttackTarget = other.transform.root.gameObject;
+		m_status.lastAttackTarget = other.transform.root.gameObject;
 	}
 
 	//攻撃判定を有効にする

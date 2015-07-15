@@ -46,14 +46,27 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script\AssetManager.cs" />
      <Compile Include="Assets\Script\AttackArea.cs" />
+     <Compile Include="Assets\Script\AttackAreaActivator.cs" />
+     <Compile Include="Assets\Script\AudioManager.cs" />
      <Compile Include="Assets\Script\CharaAnimation.cs" />
      <Compile Include="Assets\Script\CharacterMove.cs" />
      <Compile Include="Assets\Script\CharacterStatus.cs" />
+     <Compile Include="Assets\Script\CharacterStatusGui.cs" />
+     <Compile Include="Assets\Script\DropItem.cs" />
+     <Compile Include="Assets\Script\EnemyCtrl.cs" />
+     <Compile Include="Assets\Script\EnemyManagerCtrl.cs" />
      <Compile Include="Assets\Script\FollowCamera.cs" />
+     <Compile Include="Assets\Script\GameResultGui.cs" />
+     <Compile Include="Assets\Script\GameRuleCtrl.cs" />
+     <Compile Include="Assets\Script\GameTimerGui.cs" />
      <Compile Include="Assets\Script\HitArea.cs" />
      <Compile Include="Assets\Script\InputManager.cs" />
      <Compile Include="Assets\Script\PlayerCtrl.cs" />
+     <Compile Include="Assets\Script\SeachArea.cs" />
+     <Compile Include="Assets\Script\TargetCursor.cs" />
+     <Compile Include="Assets\Script\TitleSceneCtrl.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.3/UnityEngine.UI.dll</HintPath>
  </Reference>
